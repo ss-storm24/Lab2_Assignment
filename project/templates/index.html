@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block body %}
+
+<div class="header" style="color:#231814">
+	<h1>Calgary Building Permit Search</h1>
+</div>
+
+<!-- Dates picker for the building permits -->
+<div class="form-group">
+	<form action="{{ url_for('index') }}" method="POST">
+		<label class="control-label"> Select a Date Range:
+			<div class="input-group input-dates">
+				<input type="date" class="form-control" name="start" id="stdt">
+				<input type="date" class="form-control" name="end" id="endt">
+				<button type="submit" id="submit" class="btn btn-primary">Submit</button>
+			</div>
+		</label>
+	</form>
+</div>
+
+<!-- Map initialization, loading, and GeoJSON markers -->
+<div id="map">
+	<script>
+		// initialize map //
+		var map = L.map('map').setView([51.05, -114.06], 13);
+
+      	// load a tile layer
+      	var layer1 = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+      	attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      	maxZoom: 18,
+      	id: 'mapbox/streets-v11',
+      	tileSize: 512,
+      	zoomOffset: -1,
+      	accessToken: 'sk.eyJ1Ijoic2FuZHN0b3JtMTYiLCJhIjoiY2t6eGY4cGd0MDB4aTJ1cWZ6b3VpMzB0dyJ9.3qQy_YGllZoRb4VtuI_9-g'
+      	});
+      	map.addLayer(layer1);
+
+		// load GeoJSON //
+		var oms = new OverlappingMarkerSpiderfier(map);
+
+		var calPermits = $.ajax({
+			url: "https://data.calgary.ca/resource/c2es-76ed.geojson?$where=issueddate >= '{{ stdt }}' AND issueddate <= '{{ endt }}' ",
+			dataType: "json"
+		}).done(function() {
+			var markers = L.markerClusterGroup();
+
+			L.geoJSON(calPermits.responseJSON, {
+				onEachFeature: function(feature, layer) {
+					layer.bindPopup(
+						"<h5>Building Permit Information </h5>" +
+						"<br><b>Permit Number: </b>" + feature.properties.permitnum +
+						"<br><b>Issued Date: </b>" + feature.properties.issueddate.slice(0,10) +
+						"<br><b>Work Class Group: </b>" + feature.properties.workclassgroup +
+						"<br><b>Contractor Name: </b>" + feature.properties.contractorname +
+						"<br><b>Community Name: </b>" + feature.properties.communityname +
+						"<br><b>Original Address: </b>" + feature.properties.originaladdress
+					);
+				}
+			}).addTo(markers);
+			markers.addTo(map);
+		});
+	</script>
+</div>
+
+{% endblock %}
