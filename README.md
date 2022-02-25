@@ -7,7 +7,7 @@
 
 ## Project Summary
 
-The Lab 2 project task was to build a geoweb application using GeoJSON, Leaflet, and the City of Calgary's Open Calgary API to get building permit data that user are able to query by selecting date ranges. The building permit data will then be displayed using map icons and popups. All pertinent project data can be found in the "project" folder.
+The Lab 2 project task was to build a geoweb application using GeoJSON, Leaflet, and the City of Calgary's Open Calgary API to get building permit data that users are able to query by selecting date ranges. The building permit data will then be displayed using map icons and popups. All pertinent project data can be found in the "project" folder.
 
 The main file is application.py which holds the app routes. The templates folder holds two files, index.html, the "Home" page with the map and search function, and layout.html, the foundation for index.html with all the stylesheets and scripts for the functionality of index.html.
 
